@@ -1,0 +1,3 @@
+export const HOME_CONTAINER_PADDING = 24;
+
+export const HOME_PRESENCE_ITEM_MARGIN = 8;
