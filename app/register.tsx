@@ -4,6 +4,7 @@ import {
   getBranches,
   getDepartmentsByDivisionId,
   getDivisions,
+  login,
   register,
 } from "@/services/auth-service";
 import { router } from "expo-router";
@@ -18,6 +19,7 @@ import {
 // import * as Device from "expo-device";
 import { IBaseOption } from "@/interfaces/base.interface";
 import BaseText from "@/components/BaseText";
+import { useSecureStore } from "@/hooks/useSecureStore";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -35,6 +37,8 @@ export default function Register() {
   const [branchList, setBranchList] = useState<IBaseOption[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const store = useSecureStore();
 
   const fetchDivisions = async () => {
     try {
@@ -141,9 +145,15 @@ export default function Register() {
       const res = await register(payload);
 
       if (res.status === "OK") {
-        Alert.alert("Success", "Your account has been created");
-        router.push("/login");
-        return;
+        const resLogin = await login({
+          email,
+          password,
+        });
+        if (resLogin.token) {
+          await store.setItem("token", resLogin.token);
+          Alert.alert("Success", "Your account has been created");
+          router.navigate("/");
+        }
       }
     } catch (error: any) {
       Alert.alert(
