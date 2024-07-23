@@ -43,16 +43,23 @@ export default function Scanner() {
     (state) => state.presence.hasCheckedOutToday
   );
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isCameraBusy, setIsCameraBusy] = useState(false);
 
   const handleBarcodeScanned = async (data: string | PresenceType) => {
-    if (isLoading) return;
+    setIsCameraBusy(true);
 
     if (
       data !== PresenceType.PRESENSI_MASUK &&
       data !== PresenceType.PRESENSI_PULANG
     ) {
-      Alert.alert("Error", "Invalid QR code");
+      Alert.alert("Error", "Invalid QR code", [
+        {
+          text: "Scan again",
+          onPress: () => {
+            setIsCameraBusy(false);
+          },
+        },
+      ]);
       return;
     }
 
@@ -69,7 +76,6 @@ export default function Scanner() {
 
     try {
       setIsShowModal(true);
-      setIsLoading(true);
 
       let res;
       if (data === PresenceType.PRESENSI_MASUK) {
@@ -91,13 +97,12 @@ export default function Scanner() {
           onPress: () => {
             setIsShowModal(false);
             router.navigate("/");
+            setIsCameraBusy(false);
           },
         },
       ]);
     } catch (error: any) {
       Alert.alert("Failed", error?.response?.data?.message || error?.message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -163,21 +168,23 @@ export default function Scanner() {
 
   return (
     <View style={styles.container}>
-      <CameraView
-        style={styles.camera}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr"],
-        }}
-        onBarcodeScanned={({ data }) => handleBarcodeScanned(data)}
-      >
-        <View style={styles.scanContainer}>
-          <MaterialCommunityIcons
-            name="scan-helper"
-            size={Dimensions.get("window").width - 80}
-            color="#ffffff30"
-          />
-        </View>
-      </CameraView>
+      {!isCameraBusy && (
+        <CameraView
+          style={styles.camera}
+          barcodeScannerSettings={{
+            barcodeTypes: ["qr"],
+          }}
+          onBarcodeScanned={({ data }) => handleBarcodeScanned(data)}
+        >
+          <View style={styles.scanContainer}>
+            <MaterialCommunityIcons
+              name="scan-helper"
+              size={Dimensions.get("window").width - 80}
+              color="#ffffff30"
+            />
+          </View>
+        </CameraView>
+      )}
 
       <Modal
         animationType="fade"
