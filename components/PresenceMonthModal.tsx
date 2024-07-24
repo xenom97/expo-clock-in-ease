@@ -21,7 +21,7 @@ interface IPresenceMonthModalProps {
 
 const months = getMonthList().map((item, idx) => ({
   label: item,
-  value: idx + 1,
+  value: idx,
 }));
 
 export default function PresenceMonthModal({

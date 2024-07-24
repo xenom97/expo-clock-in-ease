@@ -1,10 +1,10 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import React, { useMemo } from "react";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { getCurrentMonth, getMonthName } from "@/utils/date";
+import { getCurrentMonth } from "@/utils/date";
 import BaseText from "./BaseText";
 import { Shimmer } from "./Shimmer";
-import { isLoading } from "expo-font";
+import { MONTHS } from "@/constants/month";
 
 interface IPresenceHeaderProps {
   openModal: () => void;
@@ -20,7 +20,7 @@ export default function PresenceHeader({
   loading,
 }: IPresenceHeaderProps) {
   const currentMonthName = useMemo(() => {
-    return getMonthName(currentMonth);
+    return MONTHS[currentMonth];
   }, [currentMonth]);
 
   const handleNextMonth = () => {
@@ -36,7 +36,7 @@ export default function PresenceHeader({
   };
 
   const isDisabledPrevMonth = useMemo(() => {
-    return currentMonth === 1;
+    return currentMonth === 0;
   }, [currentMonth]);
 
   return (

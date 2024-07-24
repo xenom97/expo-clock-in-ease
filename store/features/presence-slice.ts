@@ -3,11 +3,13 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 export interface PresenceState {
   hasCheckedInToday: boolean
   hasCheckedOutToday: boolean
+  refetchPresence: boolean
 }
 
 const initialState: PresenceState = {
   hasCheckedInToday: false,
   hasCheckedOutToday: false,
+  refetchPresence: false
 };
 
 export const presenceSlice = createSlice({
@@ -20,12 +22,16 @@ export const presenceSlice = createSlice({
     setHasCheckedOutToday: (state, action: PayloadAction<boolean>) => {
       state.hasCheckedOutToday = action.payload;
     },
+    setRefetchPresence: (state, action: PayloadAction<boolean>) => {
+      state.refetchPresence = action.payload;
+    }
   },
 });
 
 export const {
   setHasCheckedInToday,
-  setHasCheckedOutToday
+  setHasCheckedOutToday,
+  setRefetchPresence
 } = presenceSlice.actions;
 
 export default presenceSlice.reducer;

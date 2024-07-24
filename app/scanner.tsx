@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   setHasCheckedInToday,
   setHasCheckedOutToday,
+  setRefetchPresence,
 } from "@/store/features/presence-slice";
 import BaseText from "@/components/BaseText";
 
@@ -98,6 +99,7 @@ export default function Scanner() {
             setIsShowModal(false);
             router.navigate("/");
             setIsCameraBusy(false);
+            dispatch(setRefetchPresence(true));
           },
         },
       ]);

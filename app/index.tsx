@@ -11,8 +11,8 @@ import { setUser } from "@/store/features/user-slice";
 import { useAppDispatch } from "@/store/hooks";
 import { getCurrentMonth } from "@/utils/date";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { router, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Alert,
   View,
@@ -48,20 +48,18 @@ export default function Index() {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const checkToken = async () => {
-        const hasToken = await store.getItem("token");
-        if (!hasToken) {
-          router.navigate("/login");
-        } else {
-          fetchUser();
-        }
-      };
+  useEffect(() => {
+    const checkToken = async () => {
+      const hasToken = await store.getItem("token");
+      if (!hasToken) {
+        router.navigate("/login");
+      } else {
+        fetchUser();
+      }
+    };
 
-      checkToken();
-    }, [])
-  );
+    checkToken();
+  }, []);
 
   return (
     <ImageBackground

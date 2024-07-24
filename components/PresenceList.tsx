@@ -1,6 +1,5 @@
 import { Alert, Dimensions, FlatList, StyleSheet, View } from "react-native";
-import React, { useCallback, useMemo, useState } from "react";
-import { getMonthName } from "@/utils/date";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   HOME_CONTAINER_PADDING,
   HOME_PRESENCE_ITEM_MARGIN,
@@ -11,14 +10,15 @@ import {
   IResponseGetPresence,
   StatusPresence,
 } from "@/interfaces/presence.interface";
-import { useFocusEffect } from "expo-router";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   setHasCheckedInToday,
   setHasCheckedOutToday,
+  setRefetchPresence,
 } from "@/store/features/presence-slice";
 import BaseText from "./BaseText";
 import { Shimmer } from "./Shimmer";
+import { MONTHS } from "@/constants/month";
 
 interface IPresenceListProps {
   currentMonth: number;
@@ -27,19 +27,18 @@ interface IPresenceListProps {
 export default function PresenceList({ currentMonth }: IPresenceListProps) {
   const [dataPresence, setDataPresence] = useState<IResponseGetPresence>({});
   const dispatch = useAppDispatch();
+  const isRefetch = useAppSelector((state) => state.presence.refetchPresence);
 
   const [isLoading, setIsLoading] = useState(true);
 
   const days = useMemo(() => {
-    const currentMonthName = getMonthName(currentMonth);
+    const currentMonthName = MONTHS[currentMonth];
     return dataPresence[currentMonthName] || [];
   }, [currentMonth, dataPresence]);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchPresence();
-    }, [])
-  );
+  useEffect(() => {
+    fetchPresence();
+  }, [isRefetch]);
 
   const fetchPresence = async () => {
     try {
@@ -47,6 +46,10 @@ export default function PresenceList({ currentMonth }: IPresenceListProps) {
       const res = await getPresence();
       setDataPresence(res);
       updateTodayPresenceStatus();
+
+      if (isRefetch) {
+        dispatch(setRefetchPresence(false));
+      }
     } catch (error: any) {
       Alert.alert(
         "Failed getting presence data",
@@ -60,7 +63,7 @@ export default function PresenceList({ currentMonth }: IPresenceListProps) {
   const updateTodayPresenceStatus = () => {
     if (!Object.keys(dataPresence || {}).length) return;
 
-    const currentMonthName = getMonthName(currentMonth);
+    const currentMonthName = MONTHS[currentMonth];
     const currentMonthData = dataPresence[currentMonthName];
     const todayData = currentMonthData[new Date().getDate() - 1];
 
